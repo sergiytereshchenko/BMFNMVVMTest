@@ -1,4 +1,6 @@
-﻿using GalaSoft.MvvmLight;
+﻿using System;
+using System.Collections.ObjectModel;
+using GalaSoft.MvvmLight;
 using BMFNMVVMTest.Model;
 
 namespace BMFNMVVMTest.ViewModel
@@ -43,6 +45,30 @@ namespace BMFNMVVMTest.ViewModel
             }
         }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        private ObservableCollection<Object> foundedItems = new ObservableCollection<Object>();
+
+
+        public ObservableCollection<object> FoundedItems
+        {
+            get { return foundedItems; }
+        }
+
+
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
@@ -60,7 +86,54 @@ namespace BMFNMVVMTest.ViewModel
 
                     WelcomeTitle = item.Title;
                 });
+
+            ReportsContext intitalRC = ReportsContext.Instance;
+            findItems(null);
+
+
+
+
+
+
+
+
         }
+
+
+
+        private void findItems(string searchString)
+        {
+            FoundedItems.Clear();
+
+            if (String.IsNullOrEmpty(searchString))
+            {
+                foreach (var curReport in ReportsContext.TestData)
+                {
+                    foundedItems.Add(curReport);
+                }
+            }
+            else
+            {
+                Boolean isFounded;
+                foreach (var curReport in ReportsContext.TestData)
+                {
+                    isFounded = false;
+                    ReportsContext.ReportsParser.FindStringInReport(curReport, searchString, ref isFounded);
+
+                    if (isFounded)
+                    {
+                        foundedItems.Add(curReport);
+                    }
+                }
+            }
+
+        }
+
+
+
+
+
+
 
         ////public override void Cleanup()
         ////{
