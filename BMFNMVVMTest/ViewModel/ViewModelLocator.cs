@@ -56,6 +56,21 @@ namespace BMFNMVVMTest.ViewModel
         }
 
         /// <summary>
+        /// Gets the Add property.
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance",
+            "CA1822:MarkMembersAsStatic",
+            Justification = "This non-static member is needed for data binding purposes.")]
+        public AddViewModel Add
+        {
+            get
+            {
+                return ServiceLocator.Current.GetInstance<AddViewModel>();
+            }
+        }
+
+
+        /// <summary>
         /// Cleans up all the resources.
         /// </summary>
         public static void Cleanup()

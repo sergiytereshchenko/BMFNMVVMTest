@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using GalaSoft.MvvmLight;
 using BMFNMVVMTest.Model;
+using GalaSoft.MvvmLight.Command;
 
 namespace BMFNMVVMTest.ViewModel
 {
@@ -87,20 +88,24 @@ namespace BMFNMVVMTest.ViewModel
                     WelcomeTitle = item.Title;
                 });
 
+            //Initialisation for the ReportsContext class which implemets singleton pattern
             ReportsContext intitalRC = ReportsContext.Instance;
+
+            //Initial filing ListBox in the MainWindow
             findItems(null);
-
-
-
-
-
-
-
 
         }
 
 
+        //Commands
+        public void Search(string searchString)
+        {
+            findItems(searchString);
+        }
 
+
+
+        //Methods
         private void findItems(string searchString)
         {
             FoundedItems.Clear();
@@ -126,7 +131,6 @@ namespace BMFNMVVMTest.ViewModel
                     }
                 }
             }
-
         }
 
 
