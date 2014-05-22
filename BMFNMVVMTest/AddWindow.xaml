@@ -16,10 +16,10 @@
     		VerticalAlignment="Center"
     		HorizontalAlignment="Center"
     		TextWrapping="Wrap" Margin="21,10,202,517" Width="154" Height="31" />
-        <Button x:Name="ButtonOK" Content="OK" HorizontalAlignment="Left" Height="41" Margin="10,507,0,0" VerticalAlignment="Top" Width="119" Command="{Binding SelectTypeCommand, Mode=OneWay}" IsEnabled="{Binding Path=IsReportTypeSelected}" />
+        <Button x:Name="ButtonOK" Content="OK" HorizontalAlignment="Left" Height="41" Margin="10,507,0,0" VerticalAlignment="Top" Width="119" Command="{Binding SelectTypeCommand, Mode=OneWay}" IsEnabled="{Binding Path=IsReportTypeSelected}" Click="ButtonOK_Click" />
         <Button x:Name="ButtonCancel"  Content="Cancel" HorizontalAlignment="Left" Height="41" Margin="258,507,0,0" VerticalAlignment="Top" Width="109" Click="ButtonCancel_Click"/>
         <ComboBox x:Name="ComboBoxSelectTypeReport" HorizontalAlignment="Left" Height="32" Margin="10,46,0,0" 
-                  VerticalAlignment="Top" Width="357" ItemsSource="{Binding GetTypes}" SelectedValue="{Binding SelectedReportType, Mode=OneWayToSource}">
+                  VerticalAlignment="Top" Width="357" ItemsSource="{Binding GetTypes}" SelectedValue="{Binding SelectedReportType, Mode=OneWayToSource}" SelectionChanged="ComboBoxSelectTypeReport_SelectionChanged">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">

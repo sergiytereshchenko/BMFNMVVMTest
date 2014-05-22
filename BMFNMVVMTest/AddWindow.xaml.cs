@@ -1,5 +1,9 @@
-﻿using System.Windows;
+﻿using System;
+using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Controls;
 using BMFNMVVMTest.Model;
+using BMFNMVVMTest.Parser;
 using BMFNMVVMTest.ViewModel;
 
 namespace BMFNMVVMTest
@@ -16,14 +20,21 @@ namespace BMFNMVVMTest
         {
             InitializeComponent();
             this.DataContext = new AddViewModel();
-
-           // ComboBoxSelectTypeReport.ItemsSource = ((AddViewModel)this.DataContext).GetTypes;
-            //ComboBoxSelectTypeReport.ItemsSource = ReportsContext.ListTypes;
-
         }
 
         private void ButtonCancel_Click(object sender, RoutedEventArgs e)
         {
+            this.Close();
+        }
+
+        private void ComboBoxSelectTypeReport_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            ((AddViewModel)this.DataContext).CreateFieldsForSelectedReportType(ComboBoxSelectTypeReport.SelectedItem, FieldStackPanel);
+        }
+
+        private void ButtonOK_Click(object sender, RoutedEventArgs e)
+        {
+            ((AddViewModel)this.DataContext).CreateNewReport(ComboBoxSelectTypeReport.SelectedItem, FieldStackPanel);
             this.Close();
         }
 
