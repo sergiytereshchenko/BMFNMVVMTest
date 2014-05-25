@@ -18,22 +18,22 @@ namespace BMFNMVVMTest.Parser
     {
         private Dictionary<Type, DataTemplate> reportsTemplates;
 
-        private Dictionary<Type, List<ReportField>> reportsFields;
+        private Dictionary<Type, Dictionary<string, Type>> reportsMaps;
 
-        public Dictionary<Type, DataTemplate> ReportsTemplates
+        private Dictionary<Type, DataTemplate> ReportsTemplates
         {
             get { return reportsTemplates; }
         }
 
-        public Dictionary<Type, List<ReportField>> ReportsFields
+        private Dictionary<Type, Dictionary<string, Type>> ReportsMaps
         {
-            get { return reportsFields; }
+            get { return reportsMaps; }
         }
 
         public ReportsParser()
         {
             reportsTemplates = new Dictionary<Type, DataTemplate>();
-            reportsFields = new Dictionary<Type, List<ReportField>>();
+            reportsMaps = new Dictionary<Type, Dictionary<string, Type>>();
         }
 
         //Get DataTemplate for show object of specified type
@@ -41,9 +41,8 @@ namespace BMFNMVVMTest.Parser
         {
             if (!reportsTemplates.ContainsKey(inType))
             {
-
-                DataTemplate curTemplate = new DataTemplate();
-                curTemplate.DataType = inType;
+                DataTemplate newDataTemplate = new DataTemplate();
+                newDataTemplate.DataType = inType;
 
                 FrameworkElementFactory borderElement = new FrameworkElementFactory(typeof(Border));
                 borderElement.SetValue(Border.BorderBrushProperty, Brushes.Blue);
@@ -59,12 +58,13 @@ namespace BMFNMVVMTest.Parser
                 parseReportDataTemplate(inType, gridElement, ref curGridRow, "");
 
                 borderElement.AppendChild(gridElement);
-                curTemplate.VisualTree = borderElement;
+                newDataTemplate.VisualTree = borderElement;
 
-                reportsTemplates.Add(inType, curTemplate);
+                reportsTemplates.Add(inType, newDataTemplate);
 
-
+                return newDataTemplate;
             }
+
             DataTemplate curDataTemplate;
             reportsTemplates.TryGetValue(inType, out curDataTemplate);
 
@@ -75,70 +75,6 @@ namespace BMFNMVVMTest.Parser
         private void parseReportDataTemplate(Type inType, FrameworkElementFactory inGrid, ref int curGridRow, string Parents)
         {
             //DataTemplate curTemplate;
-
-
-
-            //DataTemplate dtImpTask = new DataTemplate();
-            //dtImpTask.DataType = typeof(Task);
-            //FrameworkElementFactory border = new FrameworkElementFactory(typeof(Border));
-            //border.SetValue(Border.BorderBrushProperty, Brushes.Brown);
-            //border.SetValue(Border.BorderThicknessProperty, new Thickness(5));
-
-            //FrameworkElementFactory gridElement = new FrameworkElementFactory(typeof(Grid));
-            //gridElement.AppendChild(new FrameworkElementFactory(typeof(RowDefinition)));
-            //gridElement.AppendChild(new FrameworkElementFactory(typeof(RowDefinition)));
-            //gridElement.AppendChild(new FrameworkElementFactory(typeof(RowDefinition)));
-            //gridElement.AppendChild(new FrameworkElementFactory(typeof(ColumnDefinition)));
-            //gridElement.AppendChild(new FrameworkElementFactory(typeof(ColumnDefinition)));
-
-            //FrameworkElementFactory curTxtxBlock;
-            //curTxtxBlock = new FrameworkElementFactory(typeof(TextBlock));
-            //curTxtxBlock.SetValue(Grid.RowProperty, 0);
-            //curTxtxBlock.SetValue(Grid.ColumnProperty, 0);
-            //curTxtxBlock.SetValue(TextBlock.TextProperty, "Task Name:");
-            //gridElement.AppendChild(curTxtxBlock);
-
-            //curTxtxBlock = new FrameworkElementFactory(typeof(TextBlock));
-            //curTxtxBlock.SetValue(Grid.RowProperty, 0);
-            //curTxtxBlock.SetValue(Grid.ColumnProperty, 1);
-            //curTxtxBlock.SetBinding(TextBlock.TextProperty, new Binding("TaskName"));
-            //gridElement.AppendChild(curTxtxBlock);
-
-            //curTxtxBlock = new FrameworkElementFactory(typeof(TextBlock));
-            //curTxtxBlock.SetValue(Grid.RowProperty, 1);
-            //curTxtxBlock.SetValue(Grid.ColumnProperty, 0);
-            //curTxtxBlock.SetValue(TextBlock.TextProperty, "Description:");
-            //gridElement.AppendChild(curTxtxBlock);
-
-            //curTxtxBlock = new FrameworkElementFactory(typeof(TextBlock));
-            //curTxtxBlock.SetValue(Grid.RowProperty, 1);
-            //curTxtxBlock.SetValue(Grid.ColumnProperty, 1);
-            //curTxtxBlock.SetBinding(TextBlock.TextProperty, new Binding("Description"));
-            //gridElement.AppendChild(curTxtxBlock);
-
-            //curTxtxBlock = new FrameworkElementFactory(typeof(TextBlock));
-            //curTxtxBlock.SetValue(Grid.RowProperty, 2);
-            //curTxtxBlock.SetValue(Grid.ColumnProperty, 0);
-            //curTxtxBlock.SetValue(TextBlock.TextProperty, "Priority:");
-            //gridElement.AppendChild(curTxtxBlock);
-
-            //curTxtxBlock = new FrameworkElementFactory(typeof(TextBlock));
-            //curTxtxBlock.SetValue(Grid.RowProperty, 2);
-            //curTxtxBlock.SetValue(Grid.ColumnProperty, 1);
-            //curTxtxBlock.SetBinding(TextBlock.TextProperty, new Binding("Priority"));
-            //gridElement.AppendChild(curTxtxBlock);
-
-
-            //border.AppendChild(gridElement);
-
-            ////FrameworkElementFactory txtBlockDescription = new FrameworkElementFactory(typeof(TextBlock));
-            ////txtBlockDescription.SetBinding(TextBlock.TextProperty, new Binding("Description"));
-            ////border.AppendChild(txtBlockDescription);
-
-            //dtImpTask.VisualTree = border;
-            
-
-
             foreach (PropertyInfo curPropertyInfo in inType.GetProperties())
             {
 
@@ -274,35 +210,33 @@ namespace BMFNMVVMTest.Parser
 
                     continue;
                 }
-
             }
-
         }
 
-        //Get a list of fields for specified type for creation a new report
-        public List<ReportField> GetFields(Type inType)
+        //Get a list of specified report's fields names and types for specified type for creation a new report
+        public Dictionary<string, Type> GetReportMap(Type inType)
         {
-            List<ReportField> curFieldsList;
+            Dictionary<string, Type> curFieldsDictionary;
 
-            if (!reportsFields.ContainsKey(inType))
+            if (!reportsMaps.ContainsKey(inType))
             {
 
-                curFieldsList = new List<ReportField>();
+                curFieldsDictionary = new Dictionary<string, Type>();
 
-                parseReportFields(inType, curFieldsList, "");
+                parseReportFields(inType, curFieldsDictionary, "");
 
-                reportsFields.Add(inType, curFieldsList);
+                reportsMaps.Add(inType, curFieldsDictionary);
 
-                return curFieldsList;
+                return curFieldsDictionary;
 
             }
 
-            reportsFields.TryGetValue(inType, out curFieldsList);
+            reportsMaps.TryGetValue(inType, out curFieldsDictionary);
 
-            return curFieldsList;
+            return curFieldsDictionary;
         }
 
-        private void parseReportFields(Type inType, List<ReportField> fieldsList, string inPath)
+        private void parseReportFields(Type inType, Dictionary<string, Type> fieldsDictionary, string inPath)
         {
 
             foreach (PropertyInfo curPropertyInfo in inType.GetProperties())
@@ -321,7 +255,8 @@ namespace BMFNMVVMTest.Parser
                 //struct
                 if (curPropertyInfo.PropertyType.IsValueType && !curPropertyInfo.PropertyType.IsEnum && !curPropertyInfo.PropertyType.IsPrimitive && curPropertyInfo.PropertyType != typeof(decimal))
                 {
-                    parseReportFields(curPropertyInfo.PropertyType, fieldsList, curName);
+                    fieldsDictionary.Add(curName, curPropertyInfo.PropertyType);
+                    parseReportFields(curPropertyInfo.PropertyType, fieldsDictionary, curName);
 
                     continue;
                 }
@@ -338,7 +273,7 @@ namespace BMFNMVVMTest.Parser
                 if (curPropertyInfo.PropertyType.IsValueType)
                 {
 
-                    fieldsList.Add(new ReportField(curPropertyInfo.PropertyType, curName));
+                    fieldsDictionary.Add(curName, curPropertyInfo.PropertyType);
 
                     continue;
                 }
@@ -347,7 +282,7 @@ namespace BMFNMVVMTest.Parser
                 if (curPropertyInfo.PropertyType == typeof(System.String))
                 {
 
-                    fieldsList.Add(new ReportField(curPropertyInfo.PropertyType, curName));
+                    fieldsDictionary.Add(curName, curPropertyInfo.PropertyType);
 
                     continue;
                 }
@@ -355,24 +290,7 @@ namespace BMFNMVVMTest.Parser
                 //array
                 if (curPropertyInfo.PropertyType.IsArray)
                 {
-                    //inGrid.AppendChild(new FrameworkElementFactory(typeof(RowDefinition)));
-
-                    //FrameworkElementFactory curTxtxBlock;
-
-                    //curTxtxBlock = new FrameworkElementFactory(typeof(TextBlock));
-                    //curTxtxBlock.SetValue(Grid.RowProperty, curGridRow);
-                    //curTxtxBlock.SetValue(Grid.ColumnProperty, 0);
-                    //curTxtxBlock.SetValue(TextBlock.TextProperty, curPath);
-                    //inGrid.AppendChild(curTxtxBlock);
-
-                    //curTxtxBlock = new FrameworkElementFactory(typeof(TextBlock));
-                    //curTxtxBlock.SetValue(Grid.RowProperty, curGridRow);
-                    //curTxtxBlock.SetValue(Grid.ColumnProperty, 1);
-                    //curTxtxBlock.SetValue(TextBox.DataContextProperty, curPath);
-                    //curTxtxBlock.SetBinding(TextBlock.TextProperty, new Binding(curPath));
-                    //inGrid.AppendChild(curTxtxBlock);
-
-                    //curGridRow++;
+                    fieldsDictionary.Add(curName, curPropertyInfo.PropertyType);
 
                     continue;
                 }
@@ -380,7 +298,7 @@ namespace BMFNMVVMTest.Parser
                 //collection
                 if (curPropertyInfo.PropertyType.GetInterface("ICollection") != null)
                 {
-                    //  parsedProperties.Add(new SearchFieldInfo(curPropertyInfo.PropertyType.BaseType, curPropertyInfo.Name));
+                    fieldsDictionary.Add(curName, curPropertyInfo.PropertyType);
 
                     continue;
                 }
@@ -389,7 +307,8 @@ namespace BMFNMVVMTest.Parser
                 //class
                 if (curPropertyInfo.PropertyType.IsClass)
                 {
-                    parseReportFields(curPropertyInfo.PropertyType, fieldsList, curName);
+                    fieldsDictionary.Add(curName, curPropertyInfo.PropertyType);
+                    parseReportFields(curPropertyInfo.PropertyType, fieldsDictionary, curName);
 
                     continue;
                 }
@@ -398,7 +317,7 @@ namespace BMFNMVVMTest.Parser
 
         }
 
-        public object CreateObject(Type inType, Dictionary<string, string> fieldsData, string inPath)
+        public object CreateObject(Type inType, Dictionary<string, object> fieldsData, string inPath = "")
         {
             object newReport = null; 
 
@@ -433,25 +352,7 @@ namespace BMFNMVVMTest.Parser
                         curName = String.Format("{0}{1}", inPath, curPropertyInfo.Name);
                     }
 
-                    //if (Result)
-                    //{
-                    //    break;
-                    //}
-
-                    //try
-                    //{
-                    //    curValue = curPropertyInfo.GetValue(inReport);
-                    //    if (curValue == null)
-                    //    {
-                    //        continue;
-                    //    }
-                    //}
-                    //catch (Exception)
-                    //{
-                    //    throw;
-                    //}
-
-                    string curValue = "";
+                    object curValue = "";
                     Type curFieldType = curPropertyInfo.PropertyType;
                     
                     fieldsData.TryGetValue(curName, out curValue);
@@ -468,7 +369,7 @@ namespace BMFNMVVMTest.Parser
                     // simple types
                     if (curPropertyInfo.PropertyType.IsValueType)
                     {
-                        if (String.IsNullOrEmpty(curValue))
+                        if (String.IsNullOrEmpty((String)curValue))
                         {
                             continue;
                         }
@@ -484,7 +385,7 @@ namespace BMFNMVVMTest.Parser
                     //string
                     if (curPropertyInfo.PropertyType == typeof(System.String))
                     {
-                        if (String.IsNullOrEmpty(curValue))
+                        if (String.IsNullOrEmpty((String)curValue))
                         {
                             continue;
                         }
@@ -497,6 +398,12 @@ namespace BMFNMVVMTest.Parser
                     //array
                     if (curPropertyInfo.PropertyType.IsArray)
                     {
+                        object newArray = Activator.CreateInstance(curFieldType);
+                        Type arrayType = newArray.GetType().GetElementType();
+
+                        MessageBox.Show(arrayType.ToString());
+
+
                         //foreach (var curElement in (Array)curValue)
                         //{
                         //    Result = curElement.ToString().Equals(SearchString);

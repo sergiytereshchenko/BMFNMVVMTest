@@ -30,6 +30,7 @@
             </ComboBox.ItemTemplate>
 
         </ComboBox>
-        <StackPanel x:Name="FieldStackPanel" HorizontalAlignment="Left" Height="419" Margin="10,83,0,0" VerticalAlignment="Top" Width="357"/>
+        <TreeView x:Name="TreeViewNewObject" HorizontalAlignment="Left" Height="419" Margin="10,83,0,0" VerticalAlignment="Top" Width="159"/>
+        <ListBox x:Name="TestList" HorizontalAlignment="Left" Height="415" Margin="194,87,0,0" VerticalAlignment="Top" Width="186"/>
     </Grid>
 </Window>

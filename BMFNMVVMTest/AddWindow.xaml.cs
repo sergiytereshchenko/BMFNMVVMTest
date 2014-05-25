@@ -29,13 +29,13 @@ namespace BMFNMVVMTest
 
         private void ComboBoxSelectTypeReport_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
-            ((AddViewModel)this.DataContext).CreateFieldsForSelectedReportType(ComboBoxSelectTypeReport.SelectedItem, FieldStackPanel);
+            ((AddViewModel)this.DataContext).CreateFieldsForSelectedReportType(ComboBoxSelectTypeReport.SelectedItem, TreeViewNewObject);
         }
 
         private void ButtonOK_Click(object sender, RoutedEventArgs e)
         {
-            ((AddViewModel)this.DataContext).CreateNewReport(ComboBoxSelectTypeReport.SelectedItem, FieldStackPanel);
-            this.Close();
+            ((AddViewModel)this.DataContext).CreateNewReport(ComboBoxSelectTypeReport.SelectedItem, TreeViewNewObject, TestList);
+            //this.Close();
         }
 
     }

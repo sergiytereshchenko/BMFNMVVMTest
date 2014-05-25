@@ -46,29 +46,12 @@ namespace BMFNMVVMTest.ViewModel
             }
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         private ObservableCollection<Object> foundedItems = new ObservableCollection<Object>();
-
 
         public ObservableCollection<object> FoundedItems
         {
             get { return foundedItems; }
         }
-
 
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.

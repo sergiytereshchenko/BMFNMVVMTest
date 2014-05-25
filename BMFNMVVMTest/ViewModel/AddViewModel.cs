@@ -67,84 +67,274 @@ namespace BMFNMVVMTest.ViewModel
             get { return ReportsContext.ListTypes; }
         }
 
-        public void CreateFieldsForSelectedReportType(object inReportType, StackPanel viewElement)
-        {
-            if (inReportType==null)
-            {
-                return;
-            }
-            Type inType = inReportType as Type;
-            if (inType == null)
-            {
-                return;
-            }
-
-            viewElement.Children.Clear();
-
-            List<ReportField> curReportFields = ReportsContext.ReportsParser.GetFields(inType);
-
-            foreach (ReportField curField in curReportFields)
-            {
-                Label curLabel = new Label();
-                curLabel.Content = curField.FieldName;
-                viewElement.Children.Add(curLabel);
-
-                TextBox curTextBox = new TextBox();
-                curTextBox.Name = curField.FieldName;
-                viewElement.Children.Add(curTextBox);
-
-            }
-
-        }
-
-        public void CreateNewReport(object inReportType, StackPanel viewElement)
+        /// <summary>
+        /// Create TreeView with fields that user can use to create a new object with selected type
+        /// </summary>
+        public void CreateFieldsForSelectedReportType(object inReportType, TreeView viewElement)
         {
             if (inReportType == null)
             {
                 return;
             }
-            Type inType = inReportType as Type;
-            if (inType == null)
+
+            if (!(inReportType is Type))
             {
                 return;
             }
 
+            if (viewElement == null)
+            {
+                return;
+            }
+
+            Type inType = (Type) inReportType;
+
+            viewElement.Items.Clear();
+
+            TreeViewItem newTreeViewItem = new TreeViewItem();
+            newTreeViewItem.Header = ((Type)inReportType).Name;
+            newTreeViewItem.IsExpanded = true;
+
+            viewElement.Items.Add(newTreeViewItem);
+
+            ConstructTreeWithFields(inType, newTreeViewItem);
+
+        }
+
+        /// <summary>
+        /// parses selected Type and creates controls for a new object
+        /// </summary>
+        private void ConstructTreeWithFields(Type inType, TreeViewItem inTreeViewItem)
+        {
 
             try
             {
-                var newReport = Activator.CreateInstance(inType);
-
-
-                foreach (var curTextBox in viewElement.Children)
+                foreach (PropertyInfo curPropertyInfo in inType.GetProperties())
                 {
 
-                    if (curTextBox is TextBox)
+                    //struct
+                    if (curPropertyInfo.PropertyType.IsValueType && !curPropertyInfo.PropertyType.IsEnum && !curPropertyInfo.PropertyType.IsPrimitive && curPropertyInfo.PropertyType != typeof(decimal))
                     {
-                        // MessageBox.Show(((TextBox)curTextBox).Name);
+                        TreeViewItem newTreeViewItem = new TreeViewItem();
+                        newTreeViewItem.Header = curPropertyInfo.Name;
+                        newTreeViewItem.Name = curPropertyInfo.Name;
+                        newTreeViewItem.IsExpanded = true;
 
-                        PropertyInfo propertyInfo = newReport.GetType().GetProperty(((TextBox)curTextBox).Name);
-                        // make sure object has the property we are after
-                        if (propertyInfo != null)
-                        {
+                        inTreeViewItem.Items.Add(newTreeViewItem);
 
-                            propertyInfo.SetValue(newReport, Convert.ChangeType(((TextBox)curTextBox).Text, propertyInfo.PropertyType), null);
-                        }
+                        ConstructTreeWithFields(curPropertyInfo.PropertyType, newTreeViewItem);
 
+
+                        continue;
                     }
 
+                    // simple types & strings
+                    if ((curPropertyInfo.PropertyType.IsValueType) || (curPropertyInfo.PropertyType == typeof(System.String)))
+                    {
+
+                        TreeViewItem newTreeViewItem = new TreeViewItem();
+                        newTreeViewItem.Header = curPropertyInfo.Name;
+                        newTreeViewItem.Name = curPropertyInfo.Name;
+                        newTreeViewItem.IsExpanded = true;
+
+                        TextBox newTextBox = new TextBox();
+                        //newTextBox.Name = curPropertyInfo.Name;
+
+                        newTreeViewItem.Items.Add(newTextBox);
+
+                        inTreeViewItem.Items.Add(newTreeViewItem);
+
+                        continue;
+                    }
+
+                    //arrays & collections
+                    if ((curPropertyInfo.PropertyType.IsArray) || (curPropertyInfo.PropertyType.GetInterface("ICollection") != null))
+                    {
+
+                        TreeViewItem newTreeViewItem = new TreeViewItem();
+                        newTreeViewItem.Header = curPropertyInfo.Name;
+                        newTreeViewItem.Name = curPropertyInfo.Name;
+                        newTreeViewItem.IsExpanded = true;
+
+                        Button addButton = new Button();
+                        addButton.Content = "+";
+                        addButton.Command = new AddCollectionElement(newTreeViewItem);
+
+                        newTreeViewItem.Items.Add(addButton);
+
+                        inTreeViewItem.Items.Add(newTreeViewItem);
+
+                        continue;
+                    }
+
+                    //class
+                    if (curPropertyInfo.PropertyType.IsClass)
+                    {
+
+                        TreeViewItem newTreeViewItem = new TreeViewItem();
+                        newTreeViewItem.Header = curPropertyInfo.Name;
+                        newTreeViewItem.Name = curPropertyInfo.Name;
+                        newTreeViewItem.IsExpanded = true;
+
+                        inTreeViewItem.Items.Add(newTreeViewItem);
+
+                        ConstructTreeWithFields(curPropertyInfo.PropertyType, newTreeViewItem);
+
+                        continue;
+                    }
                 }
-
-                ReportsContext.TestData.Add(newReport);
-
             }
             catch (Exception)
             {
                 
                 throw;
             }
-
         }
 
+        /// <summary>
+        /// Create New report with data from user's fields
+        /// </summary>
+        public void CreateNewReport(object inReportType, TreeView viewElement, ListBox TestList)
+        {
+            if (inReportType == null)
+            {
+                return;
+            }
+
+            if (!(inReportType is Type))
+            {
+                return;
+            }
+
+            if (viewElement == null)
+            {
+                return;
+            }
+
+            if (viewElement.Items.Count == 0)
+            {
+                return;
+            }
+
+            Type inType = (Type)inReportType;
+
+            
+
+            try
+            {
+                var newReport = Activator.CreateInstance(inType);
+
+                TreeViewItem firstTreeViewItem = (TreeViewItem)viewElement.Items.GetItemAt(0);
+
+                Dictionary<string, Type> reportMap = ReportsContext.ReportsParser.GetReportMap(inType);
+
+
+
+                foreach (KeyValuePair<string, Type> keyValuePair in reportMap)
+                {
+                    Label lb = new Label();
+                    lb.Content = String.Format("{0} {1}", keyValuePair.Key, keyValuePair.Value);
+                    TestList.Items.Add(lb);
+                }
+
+                Label lb1 = new Label();
+                lb1.Content = String.Format("---------------------");
+                TestList.Items.Add(lb1);
+
+                Dictionary<string, object> parsedData = new Dictionary<string, object>();
+                parseFilledFields(firstTreeViewItem, reportMap, parsedData);
+
+                foreach (KeyValuePair<string, object> keyValuePair in parsedData)
+                {
+                    Label lb = new Label();
+                    lb.Content = String.Format("{0} {1}", keyValuePair.Key, keyValuePair.Value);
+                    TestList.Items.Add(lb);
+
+                }
+
+                newReport = ReportsContext.ReportsParser.CreateObject(inType, parsedData);
+
+                ReportsContext.TestData.Add(newReport);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+
+        private void parseFilledFields(TreeViewItem inTreeViewItem, Dictionary<string, Type> inReportMap,
+            Dictionary<string, object> inDictionary, string inPath="")
+        {
+
+            foreach (Control curTreeControl in inTreeViewItem.Items)
+            {
+                if (!(curTreeControl is TreeViewItem))
+                {
+                    continue;
+                }
+
+                TreeViewItem curTreeViewItem = (TreeViewItem)curTreeControl;
+
+                string curFieldName;
+
+                if (String.IsNullOrEmpty(inPath))
+                {
+                    curFieldName = curTreeViewItem.Name;
+                }
+                else
+                {
+                    curFieldName = String.Format("{0}{1}", inPath, curTreeViewItem.Name);
+                }
+
+                Type curType;
+                object curObject = null;
+
+                inReportMap.TryGetValue(curFieldName, out curType);
+
+                if (curType == null)
+                {
+                    continue;
+                }
+
+                //struct
+                if ((curType.IsValueType && !curType.IsEnum && !curType.IsPrimitive && curType != typeof(decimal))||(curType.IsClass))
+                {
+                    parseFilledFields(curTreeViewItem, inReportMap, inDictionary, curFieldName);
+                }
+
+                // simple types & strings
+                if ((curType.IsValueType) || (curType == typeof(System.String)))
+                {
+                    foreach (Control curControl in curTreeViewItem.Items)
+                    {
+                        if (curControl is TextBox)
+                        {
+                            curObject = ((TextBox)curControl).Text;
+                            break;
+                        }
+                    }
+                }
+                
+                //arrays & collections
+                if ((curType.IsArray) || (curType.GetInterface("ICollection") != null))
+                {
+                    List<string> curList = new List<string>();
+
+                    foreach (Control curControl in curTreeViewItem.Items)
+                    {
+                        if (curControl is TextBox)
+                        {
+                            curList.Add(((TextBox)curControl).Text);
+                        }
+                    }
+
+                    curObject = curList;
+                }
+
+                inDictionary.Add(curFieldName, curObject);
+            }
+        }
 
 
         /// <summary>
@@ -159,7 +349,7 @@ namespace BMFNMVVMTest.ViewModel
         /// <summary>
         /// ////////////////////////////////////////////////
         /// </summary>
-        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        public new event PropertyChangedEventHandler PropertyChanged = delegate { };
 
         protected void NotifyPropertyChanged(
             string propertyName)
@@ -192,4 +382,30 @@ namespace BMFNMVVMTest.ViewModel
 
         public event EventHandler CanExecuteChanged  = delegate { };
     }
+
+    internal class AddCollectionElement : ICommand
+    {
+        private TreeViewItem collectionTreeViewItem;
+
+        public AddCollectionElement(TreeViewItem collectionTreeViewItem)
+        {
+            this.collectionTreeViewItem = collectionTreeViewItem;
+        }
+
+        public bool CanExecute(object parameter)
+        {
+            //return IsReportTypeSelected;
+            return true;
+        }
+
+        public void Execute(object parameter)
+        {
+            TextBox newTextBox = new TextBox();
+
+            collectionTreeViewItem.Items.Add(newTextBox);
+        }
+
+        public event EventHandler CanExecuteChanged = delegate { };
+    }
+
 }
