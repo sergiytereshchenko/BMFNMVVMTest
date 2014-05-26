@@ -24,9 +24,9 @@ namespace BMFNMVVMTest
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            AddWindow addWindow = new AddWindow();
-            addWindow.Owner = this;
-            addWindow.ShowDialog();
+            //AddWindow addWindow = new AddWindow();
+            //addWindow.Owner = this;
+            //addWindow.ShowDialog();
         }
     }
 }

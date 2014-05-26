@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
@@ -58,7 +59,6 @@ namespace BMFNMVVMTest.ViewModel
             get { return selectTypeCommand; }
         }
 
-
         /// <summary>
         /// Returtns a list of report types registered in the application
         /// </summary>
@@ -106,6 +106,7 @@ namespace BMFNMVVMTest.ViewModel
         /// </summary>
         private void ConstructTreeWithFields(Type inType, TreeViewItem inTreeViewItem)
         {
+            const int TEXT_BOX_WIDTH = 200;
 
             try
             {
@@ -116,14 +117,14 @@ namespace BMFNMVVMTest.ViewModel
                     if (curPropertyInfo.PropertyType.IsValueType && !curPropertyInfo.PropertyType.IsEnum && !curPropertyInfo.PropertyType.IsPrimitive && curPropertyInfo.PropertyType != typeof(decimal))
                     {
                         TreeViewItem newTreeViewItem = new TreeViewItem();
-                        newTreeViewItem.Header = curPropertyInfo.Name;
+                        newTreeViewItem.Header = String.Format("{0} (type - {1})",curPropertyInfo.Name, curPropertyInfo.PropertyType.Name);
                         newTreeViewItem.Name = curPropertyInfo.Name;
+                        newTreeViewItem.Margin = new Thickness(0, 0, 0, 10);
                         newTreeViewItem.IsExpanded = true;
 
                         inTreeViewItem.Items.Add(newTreeViewItem);
 
                         ConstructTreeWithFields(curPropertyInfo.PropertyType, newTreeViewItem);
-
 
                         continue;
                     }
@@ -133,12 +134,13 @@ namespace BMFNMVVMTest.ViewModel
                     {
 
                         TreeViewItem newTreeViewItem = new TreeViewItem();
-                        newTreeViewItem.Header = curPropertyInfo.Name;
+                        newTreeViewItem.Header = String.Format("{0} (type - {1})", curPropertyInfo.Name, curPropertyInfo.PropertyType.Name); 
                         newTreeViewItem.Name = curPropertyInfo.Name;
+                        newTreeViewItem.Margin = new Thickness(0,0,0,10);
                         newTreeViewItem.IsExpanded = true;
 
                         TextBox newTextBox = new TextBox();
-                        //newTextBox.Name = curPropertyInfo.Name;
+                        newTextBox.Width = TEXT_BOX_WIDTH;
 
                         newTreeViewItem.Items.Add(newTextBox);
 
@@ -150,10 +152,25 @@ namespace BMFNMVVMTest.ViewModel
                     //arrays & collections
                     if ((curPropertyInfo.PropertyType.IsArray) || (curPropertyInfo.PropertyType.GetInterface("ICollection") != null))
                     {
+                        Type elementType;
+                        if (curPropertyInfo.PropertyType.IsGenericType)
+                        {
+                            elementType = curPropertyInfo.PropertyType.GetGenericArguments().Single();
+                        }
+                        else
+                        {
+                            elementType = curPropertyInfo.PropertyType.GetElementType();
+                        }
+
+                        if (elementType == null)
+                        {
+                            elementType = typeof(Object);
+                        }
 
                         TreeViewItem newTreeViewItem = new TreeViewItem();
-                        newTreeViewItem.Header = curPropertyInfo.Name;
+                        newTreeViewItem.Header = String.Format("{0} (type - {1})", curPropertyInfo.Name, elementType.Name);
                         newTreeViewItem.Name = curPropertyInfo.Name;
+                        newTreeViewItem.Margin = new Thickness(0, 0, 0, 10);
                         newTreeViewItem.IsExpanded = true;
 
                         Button addButton = new Button();
@@ -172,8 +189,9 @@ namespace BMFNMVVMTest.ViewModel
                     {
 
                         TreeViewItem newTreeViewItem = new TreeViewItem();
-                        newTreeViewItem.Header = curPropertyInfo.Name;
+                        newTreeViewItem.Header = String.Format("{0} (type - {1})", curPropertyInfo.Name, curPropertyInfo.PropertyType.Name); 
                         newTreeViewItem.Name = curPropertyInfo.Name;
+                        newTreeViewItem.Margin = new Thickness(0, 0, 0, 10);
                         newTreeViewItem.IsExpanded = true;
 
                         inTreeViewItem.Items.Add(newTreeViewItem);
@@ -194,7 +212,7 @@ namespace BMFNMVVMTest.ViewModel
         /// <summary>
         /// Create New report with data from user's fields
         /// </summary>
-        public void CreateNewReport(object inReportType, TreeView viewElement, ListBox TestList)
+        public void CreateNewReport(object inReportType, TreeView viewElement)
         {
             if (inReportType == null)
             {
@@ -218,8 +236,6 @@ namespace BMFNMVVMTest.ViewModel
 
             Type inType = (Type)inReportType;
 
-            
-
             try
             {
                 var newReport = Activator.CreateInstance(inType);
@@ -228,29 +244,8 @@ namespace BMFNMVVMTest.ViewModel
 
                 Dictionary<string, Type> reportMap = ReportsContext.ReportsParser.GetReportMap(inType);
 
-
-
-                foreach (KeyValuePair<string, Type> keyValuePair in reportMap)
-                {
-                    Label lb = new Label();
-                    lb.Content = String.Format("{0} {1}", keyValuePair.Key, keyValuePair.Value);
-                    TestList.Items.Add(lb);
-                }
-
-                Label lb1 = new Label();
-                lb1.Content = String.Format("---------------------");
-                TestList.Items.Add(lb1);
-
                 Dictionary<string, object> parsedData = new Dictionary<string, object>();
-                parseFilledFields(firstTreeViewItem, reportMap, parsedData);
-
-                foreach (KeyValuePair<string, object> keyValuePair in parsedData)
-                {
-                    Label lb = new Label();
-                    lb.Content = String.Format("{0} {1}", keyValuePair.Key, keyValuePair.Value);
-                    TestList.Items.Add(lb);
-
-                }
+                ReportsContext.ReportsParser.parseFilledFields(firstTreeViewItem, reportMap, parsedData);
 
                 newReport = ReportsContext.ReportsParser.CreateObject(inType, parsedData);
 
@@ -261,81 +256,6 @@ namespace BMFNMVVMTest.ViewModel
                 throw;
             }
         }
-
-
-        private void parseFilledFields(TreeViewItem inTreeViewItem, Dictionary<string, Type> inReportMap,
-            Dictionary<string, object> inDictionary, string inPath="")
-        {
-
-            foreach (Control curTreeControl in inTreeViewItem.Items)
-            {
-                if (!(curTreeControl is TreeViewItem))
-                {
-                    continue;
-                }
-
-                TreeViewItem curTreeViewItem = (TreeViewItem)curTreeControl;
-
-                string curFieldName;
-
-                if (String.IsNullOrEmpty(inPath))
-                {
-                    curFieldName = curTreeViewItem.Name;
-                }
-                else
-                {
-                    curFieldName = String.Format("{0}{1}", inPath, curTreeViewItem.Name);
-                }
-
-                Type curType;
-                object curObject = null;
-
-                inReportMap.TryGetValue(curFieldName, out curType);
-
-                if (curType == null)
-                {
-                    continue;
-                }
-
-                //struct
-                if ((curType.IsValueType && !curType.IsEnum && !curType.IsPrimitive && curType != typeof(decimal))||(curType.IsClass))
-                {
-                    parseFilledFields(curTreeViewItem, inReportMap, inDictionary, curFieldName);
-                }
-
-                // simple types & strings
-                if ((curType.IsValueType) || (curType == typeof(System.String)))
-                {
-                    foreach (Control curControl in curTreeViewItem.Items)
-                    {
-                        if (curControl is TextBox)
-                        {
-                            curObject = ((TextBox)curControl).Text;
-                            break;
-                        }
-                    }
-                }
-                
-                //arrays & collections
-                if ((curType.IsArray) || (curType.GetInterface("ICollection") != null))
-                {
-                    List<string> curList = new List<string>();
-
-                    foreach (Control curControl in curTreeViewItem.Items)
-                    {
-                        if (curControl is TextBox)
-                        {
-                            curList.Add(((TextBox)curControl).Text);
-                        }
-                    }
-
-                    curObject = curList;
-                }
-
-                inDictionary.Add(curFieldName, curObject);
-            }
-        }
-
 
         /// <summary>
         /// Initializes a new instance of the AddViewModel class.
@@ -385,6 +305,8 @@ namespace BMFNMVVMTest.ViewModel
 
     internal class AddCollectionElement : ICommand
     {
+        private const int TEXT_BOX_WIDTH = 200;
+
         private TreeViewItem collectionTreeViewItem;
 
         public AddCollectionElement(TreeViewItem collectionTreeViewItem)
@@ -401,8 +323,10 @@ namespace BMFNMVVMTest.ViewModel
         public void Execute(object parameter)
         {
             TextBox newTextBox = new TextBox();
+            newTextBox.Width = TEXT_BOX_WIDTH;
 
             collectionTreeViewItem.Items.Add(newTextBox);
+
         }
 
         public event EventHandler CanExecuteChanged = delegate { };

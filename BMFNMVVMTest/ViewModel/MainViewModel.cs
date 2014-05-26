@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Windows.Controls;
+using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using BMFNMVVMTest.Model;
 using GalaSoft.MvvmLight.Command;
@@ -16,35 +18,42 @@ namespace BMFNMVVMTest.ViewModel
     {
         private readonly IDataService _dataService;
 
-        /// <summary>
-        /// The <see cref="WelcomeTitle" /> property's name.
-        /// </summary>
-        public const string WelcomeTitlePropertyName = "WelcomeTitle";
+        private readonly ICommand addWindowOpen;
 
-        private string _welcomeTitle = string.Empty;
-
-        /// <summary>
-        /// Gets the WelcomeTitle property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        public string WelcomeTitle
+        public ICommand AddWindowOpen
         {
-            get
-            {
-                return _welcomeTitle;
-            }
-
-            set
-            {
-                if (_welcomeTitle == value)
-                {
-                    return;
-                }
-
-                _welcomeTitle = value;
-                RaisePropertyChanged(WelcomeTitlePropertyName);
-            }
+            get { return addWindowOpen; }
         }
+
+        ///// <summary>
+        ///// The <see cref="WelcomeTitle" /> property's name.
+        ///// </summary>
+        //public const string WelcomeTitlePropertyName = "WelcomeTitle";
+
+        //private string _welcomeTitle = string.Empty;
+
+        ///// <summary>
+        ///// Gets the WelcomeTitle property.
+        ///// Changes to that property's value raise the PropertyChanged event. 
+        ///// </summary>
+        //public string WelcomeTitle
+        //{
+        //    get
+        //    {
+        //        return _welcomeTitle;
+        //    }
+
+        //    set
+        //    {
+        //        if (_welcomeTitle == value)
+        //        {
+        //            return;
+        //        }
+
+        //        _welcomeTitle = value;
+        //        RaisePropertyChanged(WelcomeTitlePropertyName);
+        //    }
+        //}
 
         private ObservableCollection<Object> foundedItems = new ObservableCollection<Object>();
 
@@ -68,11 +77,13 @@ namespace BMFNMVVMTest.ViewModel
                         return;
                     }
 
-                    WelcomeTitle = item.Title;
+                    //WelcomeTitle = item.Title;
                 });
 
             //Initialisation for the ReportsContext class which implemets singleton pattern
             ReportsContext intitalRC = ReportsContext.Instance;
+
+            addWindowOpen = new AddWindowOpen();
 
             //Initial filing ListBox in the MainWindow
             findItems(null);
@@ -117,11 +128,6 @@ namespace BMFNMVVMTest.ViewModel
         }
 
 
-
-
-
-
-
         ////public override void Cleanup()
         ////{
         ////    // Clean up if needed
@@ -129,4 +135,26 @@ namespace BMFNMVVMTest.ViewModel
         ////    base.Cleanup();
         ////}
     }
+
+    internal class AddWindowOpen : ICommand
+    {
+        public AddWindowOpen()
+        {
+        }
+
+        public bool CanExecute(object parameter)
+        {
+            return true;
+        }
+
+        public void Execute(object parameter)
+        {
+            AddWindow addWindow = new AddWindow();
+//            addWindow.Owner = ownerWindow;
+            addWindow.ShowDialog();
+        }
+
+        public event EventHandler CanExecuteChanged = delegate { };
+    }
+
 }

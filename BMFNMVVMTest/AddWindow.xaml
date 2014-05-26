@@ -9,17 +9,12 @@
         DataContext="{Binding ViewModelName, Source={StaticResource Locator}}" Width="400" Height="600">
 
     <Grid Margin="0,0,2,3">
-        <TextBlock FontSize="18"
-    		FontWeight="Bold"
-    		Foreground="Purple"
-    		Text="Add new report"
-    		VerticalAlignment="Center"
-    		HorizontalAlignment="Center"
-    		TextWrapping="Wrap" Margin="21,10,202,517" Width="154" Height="31" />
-        <Button x:Name="ButtonOK" Content="OK" HorizontalAlignment="Left" Height="41" Margin="10,507,0,0" VerticalAlignment="Top" Width="119" Command="{Binding SelectTypeCommand, Mode=OneWay}" IsEnabled="{Binding Path=IsReportTypeSelected}" Click="ButtonOK_Click" />
-        <Button x:Name="ButtonCancel"  Content="Cancel" HorizontalAlignment="Left" Height="41" Margin="258,507,0,0" VerticalAlignment="Top" Width="109" Click="ButtonCancel_Click"/>
-        <ComboBox x:Name="ComboBoxSelectTypeReport" HorizontalAlignment="Left" Height="32" Margin="10,46,0,0" 
-                  VerticalAlignment="Top" Width="357" ItemsSource="{Binding GetTypes}" SelectedValue="{Binding SelectedReportType, Mode=OneWayToSource}" SelectionChanged="ComboBoxSelectTypeReport_SelectionChanged">
+        <TextBlock FontSize="18" FontWeight="Bold" Foreground="Purple" Text="Add new report" VerticalAlignment="Top"
+    		TextWrapping="Wrap" Margin="10,10,10,0" Height="22" TextAlignment="Center" />
+        <Button x:Name="ButtonOK" Content="OK" HorizontalAlignment="Left" Height="27" Margin="10,0,0,10" VerticalAlignment="Bottom" Width="119" Command="{Binding SelectTypeCommand, Mode=OneWay}" IsEnabled="{Binding Path=IsReportTypeSelected}" Click="ButtonOK_Click" />
+        <Button x:Name="ButtonCancel"  Content="Cancel" HorizontalAlignment="Right" Height="27" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="109" Click="ButtonCancel_Click"/>
+        <ComboBox x:Name="ComboBoxSelectTypeReport" Height="26" Margin="173,37,10,0" 
+                  VerticalAlignment="Top" ItemsSource="{Binding GetTypes}" SelectedValue="{Binding SelectedReportType, Mode=OneWayToSource}" SelectionChanged="ComboBoxSelectTypeReport_SelectionChanged">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
@@ -30,7 +25,8 @@
             </ComboBox.ItemTemplate>
 
         </ComboBox>
-        <TreeView x:Name="TreeViewNewObject" HorizontalAlignment="Left" Height="419" Margin="10,83,0,0" VerticalAlignment="Top" Width="159"/>
-        <ListBox x:Name="TestList" HorizontalAlignment="Left" Height="415" Margin="194,87,0,0" VerticalAlignment="Top" Width="186"/>
+        <TreeView x:Name="TreeViewNewObject" Margin="10,68,10,42" HorizontalContentAlignment="Stretch"/>
+        <TextBlock FontSize="12" FontWeight="Bold" Foreground="Purple" Text="Please, select report type:" VerticalAlignment="Top"
+    		TextWrapping="Wrap" Margin="10,37,0,0" Width="158" Height="26" HorizontalAlignment="Left" TextAlignment="Center"/>
     </Grid>
 </Window>

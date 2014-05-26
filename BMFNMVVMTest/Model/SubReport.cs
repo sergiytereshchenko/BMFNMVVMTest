@@ -14,6 +14,7 @@ namespace BMFNMVVMTest.Model
         public int Field9 { get; set; }
         public string Field10 { get; set; }
         public ArrayList Field11 { get; set; }
+        public SubReport2 Field12 { get; set; }
     }
 
 }
