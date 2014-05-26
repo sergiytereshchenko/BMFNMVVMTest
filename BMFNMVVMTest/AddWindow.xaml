@@ -11,7 +11,7 @@
     <Grid Margin="0,0,2,3">
         <TextBlock FontSize="18" FontWeight="Bold" Foreground="Purple" Text="Add new report" VerticalAlignment="Top"
     		TextWrapping="Wrap" Margin="10,10,10,0" Height="22" TextAlignment="Center" />
-        <Button x:Name="ButtonOK" Content="OK" HorizontalAlignment="Left" Height="27" Margin="10,0,0,10" VerticalAlignment="Bottom" Width="119" Command="{Binding SelectTypeCommand, Mode=OneWay}" IsEnabled="{Binding Path=IsReportTypeSelected}" Click="ButtonOK_Click" />
+        <Button x:Name="ButtonOK" Content="OK" HorizontalAlignment="Left" Height="27" Margin="10,0,0,10" VerticalAlignment="Bottom" Width="119" IsEnabled="{Binding Path=IsReportTypeSelected}" Click="ButtonOK_Click" />
         <Button x:Name="ButtonCancel"  Content="Cancel" HorizontalAlignment="Right" Height="27" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="109" Click="ButtonCancel_Click"/>
         <ComboBox x:Name="ComboBoxSelectTypeReport" Height="26" Margin="173,37,10,0" 
                   VerticalAlignment="Top" ItemsSource="{Binding GetTypes}" SelectedValue="{Binding SelectedReportType, Mode=OneWayToSource}" SelectionChanged="ComboBoxSelectTypeReport_SelectionChanged">

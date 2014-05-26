@@ -34,9 +34,11 @@ namespace BMFNMVVMTest
 
         private void ButtonOK_Click(object sender, RoutedEventArgs e)
         {
-            ((AddViewModel)this.DataContext).CreateNewReport(ComboBoxSelectTypeReport.SelectedItem, TreeViewNewObject);
-            this.Close();
+            if (((AddViewModel)this.DataContext).CreateNewReport(ComboBoxSelectTypeReport.SelectedItem, TreeViewNewObject))
+            {
+                this.Close(); 
+            }
+            
         }
-
     }
 }

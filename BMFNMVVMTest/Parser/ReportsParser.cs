@@ -398,7 +398,7 @@ namespace BMFNMVVMTest.Parser
         }
 
         public void parseFilledFields(TreeViewItem inTreeViewItem, Dictionary<string, Type> inReportMap,
-    Dictionary<string, object> inDictionary, string inPath = "")
+    Dictionary<string, object> inDictionary, ref bool isAllFieldsFilledRight, string inPath = "")
         {
 
             foreach (Control curTreeControl in inTreeViewItem.Items)
@@ -434,7 +434,7 @@ namespace BMFNMVVMTest.Parser
                 //struct
                 if ((curType.IsValueType && !curType.IsEnum && !curType.IsPrimitive && curType != typeof(decimal)) || (curType.IsClass))
                 {
-                    parseFilledFields(curTreeViewItem, inReportMap, inDictionary, curFieldName);
+                    parseFilledFields(curTreeViewItem, inReportMap, inDictionary, ref isAllFieldsFilledRight, curFieldName);
                 }
 
                 // simple types & strings
@@ -445,6 +445,7 @@ namespace BMFNMVVMTest.Parser
                         if (curControl is TextBox)
                         {
                             curObject = ((TextBox)curControl).Text;
+                            checkTextBoxDataType((TextBox)curControl, curType, ref isAllFieldsFilledRight);
                             break;
                         }
                     }
@@ -455,11 +456,23 @@ namespace BMFNMVVMTest.Parser
                 {
                     List<string> curList = new List<string>();
 
+                    Type elementType = null;
+                    if (curType.IsGenericType)
+                    {
+                        elementType = curType.GetGenericArguments().Single();
+                    }
+                    else
+                    {
+                        elementType = curType.GetElementType();
+                    }
+
                     foreach (Control curControl in curTreeViewItem.Items)
                     {
                         if (curControl is TextBox)
                         {
                             curList.Add(((TextBox)curControl).Text);
+
+                            checkTextBoxDataType((TextBox)curControl, elementType, ref isAllFieldsFilledRight);
                         }
                     }
 
@@ -470,6 +483,30 @@ namespace BMFNMVVMTest.Parser
             }
         }
 
+        private void checkTextBoxDataType(TextBox inTextBox, Type inType, ref bool isFieldFilledRight)
+        {
+            if (String.IsNullOrEmpty(inTextBox.Text))
+            {
+                return;
+            }
+
+            if (inType != null)
+            {
+                try
+                {
+                    TypeConverter converter = TypeDescriptor.GetConverter(inType);
+                    var result = converter.ConvertFrom(inTextBox.Text);
+                }
+                catch (Exception)
+                {
+                    inTextBox.BorderBrush = Brushes.Red;
+                    isFieldFilledRight = false;
+                    return;
+                }
+            }
+
+            inTextBox.BorderBrush = Brushes.YellowGreen;
+        }
 
         public object CreateObject(Type inType, Dictionary<string, object> fieldsData, string inPath = "")
         {

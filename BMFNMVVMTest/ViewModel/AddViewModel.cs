@@ -212,26 +212,26 @@ namespace BMFNMVVMTest.ViewModel
         /// <summary>
         /// Create New report with data from user's fields
         /// </summary>
-        public void CreateNewReport(object inReportType, TreeView viewElement)
+        public bool CreateNewReport(object inReportType, TreeView viewElement)
         {
             if (inReportType == null)
             {
-                return;
+                return false;
             }
 
             if (!(inReportType is Type))
             {
-                return;
+                return false;
             }
 
             if (viewElement == null)
             {
-                return;
+                return false;
             }
 
             if (viewElement.Items.Count == 0)
             {
-                return;
+                return false;
             }
 
             Type inType = (Type)inReportType;
@@ -245,11 +245,21 @@ namespace BMFNMVVMTest.ViewModel
                 Dictionary<string, Type> reportMap = ReportsContext.ReportsParser.GetReportMap(inType);
 
                 Dictionary<string, object> parsedData = new Dictionary<string, object>();
-                ReportsContext.ReportsParser.parseFilledFields(firstTreeViewItem, reportMap, parsedData);
 
-                newReport = ReportsContext.ReportsParser.CreateObject(inType, parsedData);
+                bool isAllFieldsFilledRight = true;
+                ReportsContext.ReportsParser.parseFilledFields(firstTreeViewItem, reportMap, parsedData, ref isAllFieldsFilledRight);
 
-                ReportsContext.TestData.Add(newReport);
+                if (isAllFieldsFilledRight)
+                {
+                    newReport = ReportsContext.ReportsParser.CreateObject(inType, parsedData);
+                    ReportsContext.TestData.Add(newReport);
+                    return true;
+                }
+                else
+                {
+                    MessageBox.Show("Some fields are filled wrong!");
+                    return false;
+                }
             }
             catch (Exception)
             {
