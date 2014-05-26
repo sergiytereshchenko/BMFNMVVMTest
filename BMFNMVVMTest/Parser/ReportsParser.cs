@@ -398,20 +398,21 @@ namespace BMFNMVVMTest.Parser
                     //array
                     if (curPropertyInfo.PropertyType.IsArray)
                     {
-                        object newArray = Activator.CreateInstance(curFieldType);
-                        Type arrayType = newArray.GetType().GetElementType();
+                        Type elementType = curPropertyInfo.PropertyType.GetElementType();
+                        ArrayList list = new ArrayList();
+                        TypeConverter converter = TypeDescriptor.GetConverter(elementType);
 
-                        MessageBox.Show(arrayType.ToString());
+                        foreach (string curString in (List<string>)curValue)
+                        {
+                            if (String.IsNullOrEmpty(curString))
+                            {
+                                continue;
+                            }
 
+                            list.Add(converter.ConvertFrom(curString));
+                        }
 
-                        //foreach (var curElement in (Array)curValue)
-                        //{
-                        //    Result = curElement.ToString().Equals(SearchString);
-                        //    if (Result)
-                        //    {
-                        //        break;
-                        //    }
-                        //}
+                        curPropertyInfo.SetValue(newReport, list.ToArray(elementType));
 
                         continue;
                     }
@@ -419,14 +420,55 @@ namespace BMFNMVVMTest.Parser
                     //collection
                     if (curPropertyInfo.PropertyType.GetInterface("ICollection") != null)
                     {
-                        //foreach (var curElement in (ICollection)curValue)
-                        //{
-                        //    Result = curElement.ToString().Equals(SearchString);
-                        //    if (Result)
-                        //    {
-                        //        break;
-                        //    }
-                        //}
+
+                        //string something = "Apple";
+                        //Type type = something.GetType();
+                        //Type listType = typeof(List<>).MakeGenericType(new[] { type });
+                        //IList list = (IList)Activator.CreateInstance(listType);
+                        
+
+                        object newCollection = Activator.CreateInstance(curPropertyInfo.PropertyType);
+
+                        Type elementType;
+
+                        if (curPropertyInfo.PropertyType.IsGenericType)
+                        {
+                            elementType = curPropertyInfo.PropertyType.GetGenericArguments().Single();
+                        }
+                        else
+                        {
+                            elementType = curPropertyInfo.PropertyType.GetElementType();
+                        }
+
+                        
+
+                        TypeConverter converter = TypeDescriptor.GetConverter(typeof(String)); 
+                        if (elementType!=null)
+                        {
+                            converter = TypeDescriptor.GetConverter(elementType);
+                        }
+
+
+                        if (newCollection is IList)
+                        {
+                            foreach (string curString in (List<string>)curValue)
+                            {
+                                if (String.IsNullOrEmpty(curString))
+                                {
+                                    continue;
+                                }
+                                if (elementType != null)
+                                {
+                                    ((IList)newCollection).Add(converter.ConvertFrom(curString));
+                                }
+                                else
+                                {
+                                    ((IList)newCollection).Add(curString);    
+                                }
+                            }
+                        }
+
+                        curPropertyInfo.SetValue(newReport, newCollection);
 
                         continue;
                     }
@@ -439,14 +481,10 @@ namespace BMFNMVVMTest.Parser
 
                         continue;
                     }
-
                 }
-
-
             }
             catch (Exception)
             {
-                
                 throw;
             }
 
