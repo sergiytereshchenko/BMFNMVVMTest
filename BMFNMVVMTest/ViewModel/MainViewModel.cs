@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
@@ -18,11 +19,43 @@ namespace BMFNMVVMTest.ViewModel
     {
         private readonly IDataService _dataService;
 
+        //Commans declaration
         private readonly ICommand addWindowOpen;
+
+        private readonly ICommand startSearch;
 
         public ICommand AddWindowOpen
         {
             get { return addWindowOpen; }
+        }
+
+        public ICommand StartSearch
+        {
+            get { return startSearch; }
+        }
+
+        //Properties declaration
+        private ObservableCollection<Object> foundedItems = new ObservableCollection<Object>();
+
+        public ObservableCollection<object> FoundedItems
+        {
+            get { return foundedItems; }
+        }
+
+        private string searchString;
+
+        public string SearchString
+        {
+            get { return searchString; }
+            set { searchString = value; }
+        }
+
+        private bool isSearchInProgress;
+
+        public bool IsSearchInProgress
+        {
+            get { return isSearchInProgress; }
+            set { isSearchInProgress = value; }
         }
 
         ///// <summary>
@@ -55,12 +88,6 @@ namespace BMFNMVVMTest.ViewModel
         //    }
         //}
 
-        private ObservableCollection<Object> foundedItems = new ObservableCollection<Object>();
-
-        public ObservableCollection<object> FoundedItems
-        {
-            get { return foundedItems; }
-        }
 
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
@@ -80,50 +107,57 @@ namespace BMFNMVVMTest.ViewModel
                     //WelcomeTitle = item.Title;
                 });
 
-            //Initialisation for the ReportsContext class which implemets singleton pattern
+            //Initialization for the ReportsContext class which implemets singleton pattern
             ReportsContext intitalRC = ReportsContext.Instance;
 
+            //Commands initialization
             addWindowOpen = new AddWindowOpen();
+            startSearch = new Search(this);
 
             //Initial filing ListBox in the MainWindow
             findItems(null);
-
         }
-
-
-        //Commands
+        
         public void Search(string searchString)
         {
+            Thread.Sleep(5000);
             findItems(searchString);
         }
-
-
 
         //Methods
         private void findItems(string searchString)
         {
-            FoundedItems.Clear();
-
-            if (String.IsNullOrEmpty(searchString))
+            try
             {
-                foreach (var curReport in ReportsContext.TestData)
-                {
-                    foundedItems.Add(curReport);
-                }
-            }
-            else
-            {
-                Boolean isFounded;
-                foreach (var curReport in ReportsContext.TestData)
-                {
-                    isFounded = false;
-                    ReportsContext.ReportsParser.FindStringInReport(curReport, searchString, ref isFounded);
+                FoundedItems.Clear();
 
-                    if (isFounded)
+                if (String.IsNullOrEmpty(searchString))
+                {
+                    foreach (var curReport in ReportsContext.TestData)
                     {
                         foundedItems.Add(curReport);
                     }
                 }
+                else
+                {
+                    Boolean isFounded;
+                    foreach (var curReport in ReportsContext.TestData)
+                    {
+                        isFounded = false;
+                        ReportsContext.ReportsParser.FindStringInReport(curReport, searchString, ref isFounded);
+
+                        if (isFounded)
+                        {
+                            foundedItems.Add(curReport);
+                        }
+                    }
+                }
+
+            }
+            catch (Exception)
+            {
+                
+                throw;
             }
         }
 
@@ -136,6 +170,11 @@ namespace BMFNMVVMTest.ViewModel
         ////}
     }
 
+    //Commands
+
+    /// <summary>
+    /// Opens the dialog window for creating a new report.
+    /// </summary>
     internal class AddWindowOpen : ICommand
     {
         public AddWindowOpen()
@@ -150,11 +189,36 @@ namespace BMFNMVVMTest.ViewModel
         public void Execute(object parameter)
         {
             AddWindow addWindow = new AddWindow();
-//            addWindow.Owner = ownerWindow;
             addWindow.ShowDialog();
         }
 
         public event EventHandler CanExecuteChanged = delegate { };
     }
+
+    /// <summary>
+    /// Makes search in the data source by search string
+    /// </summary>
+    internal class Search : ICommand
+    {
+        private MainViewModel thisViewModel;
+
+        public Search(MainViewModel thisViewModel)
+        {
+            this.thisViewModel = thisViewModel;
+        }
+
+        public bool CanExecute(object parameter)
+        {
+            return true;
+        }
+
+        public void Execute(object parameter)
+        {
+            thisViewModel.Search(thisViewModel.SearchString);
+        }
+
+        public event EventHandler CanExecuteChanged = delegate { };
+    }
+
 
 }

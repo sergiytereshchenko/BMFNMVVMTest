@@ -16,17 +16,5 @@ namespace BMFNMVVMTest
             InitializeComponent();
             Closing += (s, e) => ViewModelLocator.Cleanup();
         }
-
-        private void SearchButton_Click(object sender, RoutedEventArgs e)
-        {
-            ((MainViewModel) this.DataContext).Search(SearchTextBox.Text);
-        }
-
-        private void AddButton_Click(object sender, RoutedEventArgs e)
-        {
-            //AddWindow addWindow = new AddWindow();
-            //addWindow.Owner = this;
-            //addWindow.ShowDialog();
-        }
     }
 }
