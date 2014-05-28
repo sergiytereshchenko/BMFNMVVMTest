@@ -22,9 +22,11 @@
     </Window.Resources>
 
     <Grid x:Name="LayoutRoot" Margin="0,0,-8,0">
+        <Rectangle x:Name="SearchCurtain" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="169" Stroke="Black" VerticalAlignment="Top" Width="249" Opacity="0" MouseDown="Rectangle_MouseDown"/>
         <ListBox x:Name="FoundedItemsListBox" ItemTemplateSelector="{StaticResource myDataTemplateSelector}" ItemsSource="{Binding FoundedItems}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Top" Margin="0,42,10,40"/>
-        <Button x:Name="SearchButton"  Content="Search..." HorizontalAlignment="Right" Margin="0,0,294,10" Width="96" Height="25" VerticalAlignment="Bottom" Command="{Binding StartSearch, Mode=OneWay}"/>
+        <Button x:Name="SearchButton"  Content="Search..." Margin="10,0,0,10" Height="25" VerticalAlignment="Bottom" Command="{Binding StartSearch, Mode=OneWay}" HorizontalAlignment="Left" Width="96"/>
         <TextBox x:Name="SearchTextBox" Margin="113,0,41,10" TextWrapping="Wrap" Height="25" VerticalAlignment="Bottom" Text="{Binding SearchString, Mode=TwoWay}"/>
         <Button x:Name="AddButton" Content="Add new report..." HorizontalAlignment="Left" Height="25" Margin="10,10,0,0" VerticalAlignment="Top" Width="131" Command="{Binding AddWindowOpen, Mode=OneWay}"/>
+        <Button Content="Button" HorizontalAlignment="Left" Height="25" Margin="319,10,0,0" VerticalAlignment="Top" Width="54" Click="Button_Click"/>
     </Grid>
 </Window>

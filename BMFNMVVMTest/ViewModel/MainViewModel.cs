@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Threading;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 using GalaSoft.MvvmLight;
 using BMFNMVVMTest.Model;
 using GalaSoft.MvvmLight.Command;
@@ -115,23 +117,37 @@ namespace BMFNMVVMTest.ViewModel
             startSearch = new Search(this);
 
             //Initial filing ListBox in the MainWindow
-            findItems(null);
+            this.searchString = null;
+            Search();
         }
         
-        public void Search(string searchString)
+        public void Search()
         {
-            Thread.Sleep(5000);
-            findItems(searchString);
+            Thread thread = new Thread(searchItems);
+            thread.Name = "Search thread";
+            thread.Start();
+        }
+
+        private void searchItems()
+        {
+            Thread.Sleep(TimeSpan.FromSeconds(5));
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
+                        (ThreadStart)delegate()
+                        {
+                            findItems();
+                        }
+                          );
         }
 
         //Methods
-        private void findItems(string searchString)
+        private void findItems()
         {
+
             try
             {
                 FoundedItems.Clear();
 
-                if (String.IsNullOrEmpty(searchString))
+                if (String.IsNullOrEmpty(this.searchString))
                 {
                     foreach (var curReport in ReportsContext.TestData)
                     {
@@ -144,7 +160,7 @@ namespace BMFNMVVMTest.ViewModel
                     foreach (var curReport in ReportsContext.TestData)
                     {
                         isFounded = false;
-                        ReportsContext.ReportsParser.FindStringInReport(curReport, searchString, ref isFounded);
+                        ReportsContext.ReportsParser.FindStringInReport(curReport, this.searchString, ref isFounded);
 
                         if (isFounded)
                         {
@@ -214,7 +230,7 @@ namespace BMFNMVVMTest.ViewModel
 
         public void Execute(object parameter)
         {
-            thisViewModel.Search(thisViewModel.SearchString);
+            thisViewModel.Search();
         }
 
         public event EventHandler CanExecuteChanged = delegate { };
