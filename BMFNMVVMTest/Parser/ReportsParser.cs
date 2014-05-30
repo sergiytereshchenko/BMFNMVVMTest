@@ -20,16 +20,6 @@ namespace BMFNMVVMTest.Parser
 
         private Dictionary<Type, Dictionary<string, Type>> reportsMaps;
 
-        //private Dictionary<Type, DataTemplate> ReportsTemplates
-        //{
-        //    get { return reportsTemplates; }
-        //}
-
-        //private Dictionary<Type, Dictionary<string, Type>> ReportsMaps
-        //{
-        //    get { return reportsMaps; }
-        //}
-
         public ReportsParser()
         {
             reportsTemplates = new Dictionary<Type, DataTemplate>();
@@ -50,10 +40,6 @@ namespace BMFNMVVMTest.Parser
                 borderElement.SetValue(Border.BorderBrushProperty, Brushes.Blue);
                 borderElement.SetValue(Border.BorderThicknessProperty, new Thickness(3));
                 borderElement.SetValue(Border.MarginProperty, new Thickness(0, 3, 0, 3));
-
-                //FrameworkElementFactory gridElement = new FrameworkElementFactory(typeof(Grid));
-                //gridElement.AppendChild(new FrameworkElementFactory(typeof(ColumnDefinition)));
-                //gridElement.AppendChild(new FrameworkElementFactory(typeof(ColumnDefinition)));
 
                 FrameworkElementFactory newTreeeView = new FrameworkElementFactory(typeof(TreeView));
 
@@ -106,36 +92,13 @@ namespace BMFNMVVMTest.Parser
 
                     FrameworkElementFactory curTreeViewItem = new FrameworkElementFactory(typeof(TreeViewItem));
                     curTreeViewItem.SetValue(TreeViewItem.HeaderProperty, curPropertyInfo.Name);
-                    //curTreeViewItem.SetValue(TreeViewItem.IsExpandedProperty, true);
 
                     inTreeViewItem.AppendChild(curTreeViewItem);
 
                     parseReportDataTemplate(curPropertyInfo.PropertyType, curTreeViewItem, ref curGridRow, curPath);
 
-                    //inGrid.AppendChild(new FrameworkElementFactory(typeof(RowDefinition)));
-
-                    //FrameworkElementFactory curElement;
-
-                    //curElement = new FrameworkElementFactory(typeof(TextBlock));
-                    //curElement.SetValue(Grid.RowProperty, curGridRow);
-                    //curElement.SetValue(Grid.ColumnProperty, 0);
-                    //curElement.SetValue(TextBlock.TextProperty, curPropertyInfo.Name);
-                    //inGrid.AppendChild(curElement);
-
-                    //curGridRow++;
-
-                    //parseReportDataTemplate(curPropertyInfo.PropertyType, inGrid, ref curGridRow, curPath);
-
                     continue;
                 }
-
-                ////enum
-                //if (curPropertyInfo.PropertyType.IsEnum)
-                //{
-                //    parseReportDataTemplate(curPropertyInfo.PropertyType);
-
-                //    continue;
-                //}
 
                 // simple types
                 if ((curPropertyInfo.PropertyType.IsValueType)||(curPropertyInfo.PropertyType == typeof(System.String)))
@@ -150,53 +113,9 @@ namespace BMFNMVVMTest.Parser
 
                     curTreeViewItem.AppendChild(curTextBlock);
                     inTreeViewItem.AppendChild(curTreeViewItem);
-                    
-
-
-                    //inGrid.AppendChild(new FrameworkElementFactory(typeof(RowDefinition)));
-
-                    //FrameworkElementFactory curElement;
-
-                    //curElement = new FrameworkElementFactory(typeof(TextBlock));
-                    //curElement.SetValue(Grid.RowProperty, curGridRow);
-                    //curElement.SetValue(Grid.ColumnProperty, 0);
-                    //curElement.SetValue(TextBlock.TextProperty, curPath);
-                    //inGrid.AppendChild(curElement);
-
-                    //curElement = new FrameworkElementFactory(typeof(TextBlock));
-                    //curElement.SetValue(Grid.RowProperty, curGridRow);
-                    //curElement.SetValue(Grid.ColumnProperty, 1);
-                    //curElement.SetBinding(TextBlock.TextProperty, new Binding(curPath));
-                    //inGrid.AppendChild(curElement);
-
-                    //curGridRow++;
 
                     continue;
                 }
-
-                ////string
-                //if (curPropertyInfo.PropertyType == typeof(System.String))
-                //{
-                //    //inGrid.AppendChild(new FrameworkElementFactory(typeof(RowDefinition)));
-
-                //    //FrameworkElementFactory curElement;
-
-                //    //curElement = new FrameworkElementFactory(typeof(TextBlock));
-                //    //curElement.SetValue(Grid.RowProperty, curGridRow);
-                //    //curElement.SetValue(Grid.ColumnProperty, 0);
-                //    //curElement.SetValue(TextBlock.TextProperty, curPath);
-                //    //inGrid.AppendChild(curElement);
-
-                //    //curElement = new FrameworkElementFactory(typeof(TextBlock));
-                //    //curElement.SetValue(Grid.RowProperty, curGridRow);
-                //    //curElement.SetValue(Grid.ColumnProperty, 1);
-                //    //curElement.SetBinding(TextBlock.TextProperty, new Binding(curPath));
-                //    //inGrid.AppendChild(curElement);
-
-                //    //curGridRow++;
-
-                //    continue;
-                //}
 
                 //array
                 if ((curPropertyInfo.PropertyType.IsArray)||(curPropertyInfo.PropertyType.GetInterface("ICollection") != null))
@@ -204,7 +123,6 @@ namespace BMFNMVVMTest.Parser
 
                     FrameworkElementFactory curTreeViewItem = new FrameworkElementFactory(typeof(TreeViewItem));
                     curTreeViewItem.SetValue(TreeViewItem.HeaderProperty, curPropertyInfo.Name);
-//                    curTreeViewItem.SetValue(TreeViewItem.IsExpandedProperty, true);
 
                     FrameworkElementFactory curElement = new FrameworkElementFactory(typeof(ListBox));
                     curElement.SetValue(ListBox.BorderBrushProperty, Brushes.Gold);
@@ -214,54 +132,8 @@ namespace BMFNMVVMTest.Parser
                     curTreeViewItem.AppendChild(curElement);
                     inTreeViewItem.AppendChild(curTreeViewItem);
 
-
-
-                    //inGrid.AppendChild(new FrameworkElementFactory(typeof(RowDefinition)));
-
-                    //FrameworkElementFactory curElement;
-
-                    //curElement = new FrameworkElementFactory(typeof(TextBlock));
-                    //curElement.SetValue(Grid.RowProperty, curGridRow);
-                    //curElement.SetValue(Grid.ColumnProperty, 0);
-                    //curElement.SetValue(TextBlock.TextProperty, curPath);
-                    //inGrid.AppendChild(curElement);
-
-                    //curElement = new FrameworkElementFactory(typeof(ListBox));
-                    //curElement.SetValue(Grid.RowProperty, curGridRow);
-                    //curElement.SetValue(Grid.ColumnProperty, 1);
-                    //curElement.SetValue(ListBox.BorderBrushProperty, Brushes.Gold);
-                    //curElement.SetValue(ListBox.BorderThicknessProperty, new Thickness(3));
-                    //curElement.SetBinding(ListBox.ItemsSourceProperty, new Binding(curPath));
-                    //inGrid.AppendChild(curElement);
-
-                    //curGridRow++;
-
                     continue;
                 }
-
-                ////collection
-                //if (curPropertyInfo.PropertyType.GetInterface("ICollection") != null)
-                //{
-                //    inGrid.AppendChild(new FrameworkElementFactory(typeof(RowDefinition)));
-
-                //    FrameworkElementFactory curElement;
-
-                //    curElement = new FrameworkElementFactory(typeof(TextBlock));
-                //    curElement.SetValue(Grid.RowProperty, curGridRow);
-                //    curElement.SetValue(Grid.ColumnProperty, 0);
-                //    curElement.SetValue(TextBlock.TextProperty, curPath);
-                //    inGrid.AppendChild(curElement);
-
-                //    curElement = new FrameworkElementFactory(typeof(ListBox));
-                //    curElement.SetValue(Grid.RowProperty, curGridRow);
-                //    curElement.SetValue(Grid.ColumnProperty, 1);
-                //    curElement.SetBinding(ListBox.ItemsSourceProperty, new Binding(curPath));
-                //    inGrid.AppendChild(curElement);
-
-                //    curGridRow++;
-
-                //    continue;
-                //}
 
                 //class
                 if (curPropertyInfo.PropertyType.IsClass)
@@ -269,33 +141,19 @@ namespace BMFNMVVMTest.Parser
 
                     FrameworkElementFactory curTreeViewItem = new FrameworkElementFactory(typeof(TreeViewItem));
                     curTreeViewItem.SetValue(TreeViewItem.HeaderProperty, curPropertyInfo.Name);
-//                    curTreeViewItem.SetValue(TreeViewItem.IsExpandedProperty, true);
 
                     inTreeViewItem.AppendChild(curTreeViewItem);
 
                     parseReportDataTemplate(curPropertyInfo.PropertyType, curTreeViewItem, ref curGridRow, curPath);
-
-
-                    //inGrid.AppendChild(new FrameworkElementFactory(typeof(RowDefinition)));
-
-                    //FrameworkElementFactory curElement;
-
-                    //curElement = new FrameworkElementFactory(typeof(TextBlock));
-                    //curElement.SetValue(Grid.RowProperty, curGridRow);
-                    //curElement.SetValue(Grid.ColumnProperty, 0);
-                    //curElement.SetValue(TextBlock.TextProperty, curPropertyInfo.Name);
-                    //inGrid.AppendChild(curElement);
-
-                    //curGridRow++;
-
-                    //parseReportDataTemplate(curPropertyInfo.PropertyType, inGrid, ref curGridRow, curPath);
 
                     continue;
                 }
             }
         }
 
-        //Get a list of specified report's fields names and types for specified type for creation a new report
+        /// <summary>
+        /// Get a list of specified report's fields names and types for specified type for creation a new report
+        /// </summary>
         public Dictionary<string, Type> GetReportMap(Type inType)
         {
             Dictionary<string, Type> curFieldsDictionary;
@@ -318,6 +176,9 @@ namespace BMFNMVVMTest.Parser
             return curFieldsDictionary;
         }
 
+        /// <summary>
+        /// Parses type for creating its map
+        /// </summary>
         private void parseReportFields(Type inType, Dictionary<string, Type> fieldsDictionary, string inPath)
         {
 
@@ -342,14 +203,6 @@ namespace BMFNMVVMTest.Parser
 
                     continue;
                 }
-
-                //////enum
-                ////if (curPropertyInfo.PropertyType.IsEnum)
-                ////{
-                ////    parseReportDataTemplate(curPropertyInfo.PropertyType);
-
-                ////    continue;
-                ////}
 
                 // simple types
                 if (curPropertyInfo.PropertyType.IsValueType)
@@ -397,8 +250,11 @@ namespace BMFNMVVMTest.Parser
             }
         }
 
+        /// <summary>
+        /// Parses fields filled by user 
+        /// </summary>
         public void parseFilledFields(TreeViewItem inTreeViewItem, Dictionary<string, Type> inReportMap,
-    Dictionary<string, object> inDictionary, ref bool isAllFieldsFilledRight, string inPath = "")
+            Dictionary<string, object> inDictionary, ref bool isAllFieldsFilledRight, string inPath = "")
         {
 
             foreach (Control curTreeControl in inTreeViewItem.Items)
@@ -483,6 +339,9 @@ namespace BMFNMVVMTest.Parser
             }
         }
 
+        /// <summary>
+        /// Checks a value in a textbox
+        /// </summary>
         private void checkTextBoxDataType(TextBox inTextBox, Type inType, ref bool isFieldFilledRight)
         {
             if (String.IsNullOrEmpty(inTextBox.Text))
@@ -508,6 +367,9 @@ namespace BMFNMVVMTest.Parser
             inTextBox.BorderBrush = Brushes.YellowGreen;
         }
 
+        /// <summary>
+        /// Creates an object of specified type
+        /// </summary>
         public object CreateObject(Type inType, Dictionary<string, object> fieldsData, string inPath = "")
         {
             object newReport = null; 
@@ -515,19 +377,6 @@ namespace BMFNMVVMTest.Parser
             try
             {
                 newReport = Activator.CreateInstance(inType);
-
-                //PropertyInfo propertyInfo = newReport.GetType().GetProperty(((TextBox)curTextBox).Name);
-
-                //if (propertyInfo != null)
-                //{
-                //    Type curFieldType = propertyInfo.PropertyType;
-
-                //    TypeConverter converter = TypeDescriptor.GetConverter(curFieldType);
-                //    var result = converter.ConvertFrom(((TextBox)curTextBox).Text);
-
-                //    propertyInfo.SetValue(newReport, result);
-                //}
-
 
                 foreach (PropertyInfo curPropertyInfo in inType.GetProperties())
                 {
@@ -612,12 +461,6 @@ namespace BMFNMVVMTest.Parser
                     if (curPropertyInfo.PropertyType.GetInterface("ICollection") != null)
                     {
 
-                        //string something = "Apple";
-                        //Type type = something.GetType();
-                        //Type listType = typeof(List<>).MakeGenericType(new[] { type });
-                        //IList list = (IList)Activator.CreateInstance(listType);
-                        
-
                         object newCollection = Activator.CreateInstance(curPropertyInfo.PropertyType);
 
                         Type elementType;
@@ -682,7 +525,9 @@ namespace BMFNMVVMTest.Parser
             return newReport;
         }
 
-        //Try to find a specified string in a report's field
+        /// <summary>
+        /// Searches a specified string in report's fields
+        /// </summary>
         public void FindStringInReport(object inReport, string SearchString, ref Boolean Result)
         {
             Type inType = inReport.GetType();

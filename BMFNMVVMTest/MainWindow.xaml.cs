@@ -21,17 +21,13 @@ namespace BMFNMVVMTest
             InitializeComponent();
             Closing += (s, e) => ViewModelLocator.Cleanup();
 
-            Canvas.SetZIndex(SearchCurtain, 100);
+            ((MainViewModel) DataContext).SearchCurtain = SearchCurtain;
+
         }
 
         private void Rectangle_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            MessageBox.Show("asdadasd");
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            Canvas.SetZIndex(SearchCurtain, 0);
+            ((MainViewModel) DataContext).SearchMessage();
         }
 
     }

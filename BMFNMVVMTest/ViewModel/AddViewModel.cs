@@ -22,19 +22,17 @@ namespace BMFNMVVMTest.ViewModel
     /// </summary>
     public class AddViewModel : ViewModelBase, INotifyPropertyChanged
     {
-        private bool isReportTypeSelected = false;
-        private Type selectedReportType;
+
+        //Commans declaration
         private readonly ICommand selectTypeCommand ;
 
-        public bool IsReportTypeSelected
+        public ICommand SelectTypeCommand
         {
-            set
-            {
-                isReportTypeSelected = value;
-                NotifyPropertyChanged("IsReportTypeSelected");
-            }
-            get { return isReportTypeSelected; }
+            get { return selectTypeCommand; }
         }
+
+        //Properties declaration
+        private Type selectedReportType;
 
         public Type SelectedReportType
         {
@@ -54,9 +52,16 @@ namespace BMFNMVVMTest.ViewModel
             }
         }
 
-        public ICommand SelectTypeCommand
+        private bool isReportTypeSelected = false;
+
+        public bool IsReportTypeSelected
         {
-            get { return selectTypeCommand; }
+            set
+            {
+                isReportTypeSelected = value;
+                NotifyPropertyChanged("IsReportTypeSelected");
+            }
+            get { return isReportTypeSelected; }
         }
 
         /// <summary>

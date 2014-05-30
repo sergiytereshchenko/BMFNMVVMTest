@@ -4,6 +4,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Shapes;
 using System.Windows.Threading;
 using GalaSoft.MvvmLight;
 using BMFNMVVMTest.Model;
@@ -60,36 +61,13 @@ namespace BMFNMVVMTest.ViewModel
             set { isSearchInProgress = value; }
         }
 
-        ///// <summary>
-        ///// The <see cref="WelcomeTitle" /> property's name.
-        ///// </summary>
-        //public const string WelcomeTitlePropertyName = "WelcomeTitle";
+        private Rectangle searchCurtain;
 
-        //private string _welcomeTitle = string.Empty;
-
-        ///// <summary>
-        ///// Gets the WelcomeTitle property.
-        ///// Changes to that property's value raise the PropertyChanged event. 
-        ///// </summary>
-        //public string WelcomeTitle
-        //{
-        //    get
-        //    {
-        //        return _welcomeTitle;
-        //    }
-
-        //    set
-        //    {
-        //        if (_welcomeTitle == value)
-        //        {
-        //            return;
-        //        }
-
-        //        _welcomeTitle = value;
-        //        RaisePropertyChanged(WelcomeTitlePropertyName);
-        //    }
-        //}
-
+        public Rectangle SearchCurtain
+        {
+            get { return searchCurtain; }
+            set { searchCurtain = value; }
+        }
 
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
@@ -120,7 +98,12 @@ namespace BMFNMVVMTest.ViewModel
             this.searchString = null;
             Search();
         }
-        
+
+        //Methods
+
+        /// <summary>
+        /// Search in the datasource.
+        /// </summary>
         public void Search()
         {
             Thread thread = new Thread(searchItems);
@@ -128,30 +111,71 @@ namespace BMFNMVVMTest.ViewModel
             thread.Start();
         }
 
+        /// <summary>
+        /// Hides UI with unvisible rectangle djuring search procedure.
+        /// Invokes the method which creates collection of founded items. 
+        /// </summary>
         private void searchItems()
         {
-            Thread.Sleep(TimeSpan.FromSeconds(5));
-            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
-                        (ThreadStart)delegate()
-                        {
-                            findItems();
-                        }
-                          );
-        }
-
-        //Methods
-        private void findItems()
-        {
-
             try
             {
-                FoundedItems.Clear();
+                if (Application.Current.Dispatcher!=null)
+                {
+                    Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal,
+                                (ThreadStart)delegate()
+                                {
+                                    Canvas.SetZIndex(searchCurtain, 99);
+                                    Keyboard.Focus(searchCurtain);
 
-                if (String.IsNullOrEmpty(this.searchString))
+                                    isSearchInProgress = true;
+                                }
+                                  ); 
+                }
+
+
+                ObservableCollection<Object> newSearchResult = findItems();
+
+                if (Application.Current.Dispatcher != null)
+                {
+
+                    Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal,
+                        (ThreadStart) delegate()
+                        {
+                            foundedItems.Clear();
+
+                            foreach (object curReport in newSearchResult)
+                            {
+                                foundedItems.Add(curReport);
+                            }
+
+                            Canvas.SetZIndex(searchCurtain, 0);
+
+                            isSearchInProgress = false;
+                        }
+                        );
+                }
+            }
+            catch (Exception)
+            {
+                
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Returns collection of founded items. 
+        /// </summary>
+        private ObservableCollection<Object> findItems()
+        {
+            ObservableCollection<Object> newSearchResult = new ObservableCollection<object>();
+            Thread.Sleep(TimeSpan.FromSeconds(5));
+            try
+            {
+                 if (String.IsNullOrEmpty(this.searchString))
                 {
                     foreach (var curReport in ReportsContext.TestData)
                     {
-                        foundedItems.Add(curReport);
+                        newSearchResult.Add(curReport);
                     }
                 }
                 else
@@ -164,26 +188,32 @@ namespace BMFNMVVMTest.ViewModel
 
                         if (isFounded)
                         {
-                            foundedItems.Add(curReport);
+                            newSearchResult.Add(curReport);
                         }
                     }
                 }
-
             }
             catch (Exception)
             {
-                
                 throw;
             }
+            finally
+            {
+            }
+
+            return newSearchResult;
         }
 
-
-        ////public override void Cleanup()
-        ////{
-        ////    // Clean up if needed
-
-        ////    base.Cleanup();
-        ////}
+        /// <summary>
+        /// Shows message if search procedure in progress. 
+        /// </summary>
+        public void SearchMessage()
+        {
+            if (IsSearchInProgress)
+            {
+                MessageBox.Show("Search is in progress now and this operation will be available after its ending");
+            }
+        }
     }
 
     //Commands
@@ -235,6 +265,5 @@ namespace BMFNMVVMTest.ViewModel
 
         public event EventHandler CanExecuteChanged = delegate { };
     }
-
 
 }

@@ -80,7 +80,6 @@
     <Compile Include="Model\SubReport.cs" />
     <Compile Include="Model\SubReport2.cs" />
     <Compile Include="Parser\ReportDataTemplateSelector.cs" />
-    <Compile Include="Parser\ReportField.cs" />
     <Compile Include="Parser\ReportsParser.cs" />
     <Compile Include="ViewModel\AddViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
