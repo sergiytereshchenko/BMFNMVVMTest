@@ -20,8 +20,6 @@ namespace BMFNMVVMTest.ViewModel
     /// </summary>
     public class MainViewModel : ViewModelBase
     {
-        private readonly IDataService _dataService;
-
         //Commans declaration
         private readonly ICommand addWindowOpen;
 
@@ -72,21 +70,8 @@ namespace BMFNMVVMTest.ViewModel
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
-        public MainViewModel(IDataService dataService)
+        public MainViewModel()
         {
-            _dataService = dataService;
-            _dataService.GetData(
-                (item, error) =>
-                {
-                    if (error != null)
-                    {
-                        // Report error here
-                        return;
-                    }
-
-                    //WelcomeTitle = item.Title;
-                });
-
             //Initialization for the ReportsContext class which implemets singleton pattern
             ReportsContext intitalRC = ReportsContext.Instance;
 
